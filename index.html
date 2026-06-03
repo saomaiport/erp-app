@@ -997,8 +997,8 @@ body.readonly-mode::before{
   <div class="nsnn-subtabs" id="catalog-subtabs">
     <button class="nsnn-subtab active" onclick="catalogSwitchTab('companies')">🏛 Công ty</button>
     <button class="nsnn-subtab" onclick="catalogSwitchTab('departments')">🏢 Phòng/Ban</button>
-    <button class="nsnn-subtab" onclick="catalogSwitchTab('vessels')">⛵ Tàu</button>
-    <button class="nsnn-subtab" onclick="catalogSwitchTab('projects')">📐 Dự án</button>
+    <button class="nsnn-subtab" onclick="catalogSwitchTab('vessels')" style="display:none">⛵ Tàu</button>
+    <button class="nsnn-subtab" onclick="catalogSwitchTab('projects')" style="display:none">📐 Dự án</button>
     <button class="nsnn-subtab" onclick="catalogSwitchTab('expenseTypes')">💸 Loại chi phí</button>
     <button class="nsnn-subtab" onclick="catalogSwitchTab('revenueTypes')">💰 Loại doanh thu</button>
     <button class="nsnn-subtab" onclick="catalogSwitchTab('vendors')">🤝 NCC</button>
@@ -2683,7 +2683,7 @@ body.readonly-mode::before{
    ============================================================ */
 
 const AUTH_KEY='smp_cang_auth_v3';   // multi-user config (tách khỏi Seahorse)
-const APP_VERSION='1.00.04-SMP'; // fix an nav tau that su (chan applyRoleUI + navTo)
+const APP_VERSION='1.00.05-SMP'; // don dashboard + sub-tab danh muc tau
 
 /* v2.62.0: Token xác thực backend — PHẢI khớp API_TOKEN trong Apps Script (Code.gs).
    Mọi request tới Apps Script tự động được gắn token qua lớp bọc fetch bên dưới.
@@ -23231,17 +23231,9 @@ function renderDashboard(){
   document.getElementById('dash-year').textContent=yr;
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('vi-VN',{day:'2-digit',month:'long',year:'numeric'});
 
-  // Alerts (số dư thu hộ - chi hộ)
+  // Alerts (số dư thu hộ - chi hộ) — v1.00-SMP: GỠ (nghiệp vụ tàu không dùng)
   const alertsEl=document.getElementById('alerts-zone');
   let alerts='';
-  S.opVessels.forEach(v=>{
-    const bal=opBalance(v.id);
-    if(bal<v.min){
-      alerts+=`<div class="alert danger"><div class="alert-text"><b>⚠ ${esc(v.name)}</b> · Số dư thu hộ–chi hộ <b>${fmt(bal,v.ccy)}</b> dưới ngưỡng tối thiểu <b>${fmt(v.min,v.ccy)}</b>. Cần bổ sung gấp.</div><button class="btn-sec" onclick="navTo('operations')">Xem chi tiết</button></div>`;
-    } else if(bal<v.min*1.2){
-      alerts+=`<div class="alert"><div class="alert-text"><b>⚡ ${esc(v.name)}</b> · Số dư ${fmt(bal,v.ccy)} gần ngưỡng ${fmt(v.min,v.ccy)}.</div><button class="btn-sec" onclick="navTo('operations')">Xem</button></div>`;
-    }
-  });
   alertsEl.innerHTML=alerts;
 
   // KPI: Total rev / cost / margin / projects (only APPROVED transactions enter BI)
@@ -23299,7 +23291,7 @@ function renderDashboard(){
     <div class="kpi"><div class="kpi-label">Doanh thu ${yr}</div><div class="kpi-value">${fmt(rev)}</div><div class="kpi-sub">KH ${fmt(planRev)} · <span class="${planAch>=1?'up':planAch>=.7?'':'down'}">${pct(planAch)}</span></div></div>
     <div class="kpi"><div class="kpi-label">Chi phí ${yr}</div><div class="kpi-value" style="color:var(--accent)">${fmt(cost)}</div><div class="kpi-sub">${txs.filter(t=>t.type==='COST').length} bút toán</div></div>
     <div class="kpi"><div class="kpi-label">Margin</div><div class="kpi-value" style="color:${m>=0?'var(--good)':'var(--bad)'}">${fmt(m)}</div><div class="kpi-sub">${rev?((m/rev)*100).toFixed(1):0}%</div></div>
-    <div class="kpi"><div class="kpi-label">Dự án hoạt động</div><div class="kpi-value">${S.projects.length}</div><div class="kpi-sub">${S.vessels.length} tàu · ${S.opVessels.length} tàu QL</div></div>
+    <div class="kpi"><div class="kpi-label">Khách hàng / Đối tác</div><div class="kpi-value">${(S.companies||[]).filter(c=>!c.isParent).length}</div><div class="kpi-sub">${(S.vendors||[]).length} nhà cung cấp</div></div>
     <div class="kpi" style="background:rgba(184,71,46,.04);border-left:3px solid var(--accent);cursor:pointer" onclick="navTo('salary_fund')" title="Click để vào Quỹ TL">
       <div class="kpi-label">💰 Quỹ tiền lương</div>
       <div class="kpi-value" style="color:var(--good);font-size:18px">${sfBalanceDisplayStr}</div>
