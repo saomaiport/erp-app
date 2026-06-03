@@ -2683,7 +2683,7 @@ body.readonly-mode::before{
    ============================================================ */
 
 const AUTH_KEY='smp_cang_auth_v3';   // multi-user config (tách khỏi Seahorse)
-const APP_VERSION='1.00.05-SMP'; // don dashboard + sub-tab danh muc tau
+const APP_VERSION='1.00.06-SMP'; // chan cung trang tau o canAccessTab (code chet an toan)
 
 /* v2.62.0: Token xác thực backend — PHẢI khớp API_TOKEN trong Apps Script (Code.gs).
    Mọi request tới Apps Script tự động được gắn token qua lớp bọc fetch bên dưới.
@@ -32906,6 +32906,8 @@ function showPermissionDenied(reason, count){
 /* Helper: check if current user can access a given tab.
    Used to skip rendering for tabs not in user's allowed list. */
 function canAccessTab(tabId){
+  // v1.00-SMP: các trang nghiệp vụ tàu ĐÃ GỠ — chặn cứng mọi vai trò
+  if(['projects','vessels','operations','op_input','vessel_expense'].includes(tabId)) return false;
   if(CURRENT_ROLE==='admin') return true;
   if(!CURRENT_USER) return false;
   if(tabId==='dashboard') return false;  // admin-only

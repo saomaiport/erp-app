@@ -1,5 +1,5 @@
 {
-  "version": "1.00.05-SMP",
-  "notes": "Dọn Dashboard (gỡ alert thu hộ tàu, đổi KPI sang Khách hàng/Đối tác) + ẩn sub-tab Tàu/Dự án trong Danh mục",
+  "version": "1.00.06-SMP",
+  "notes": "Chặn cứng trang nghiệp vụ tàu ở canAccessTab — code chết an toàn, không route/render kể cả admin",
   "date": "2026-06-03"
 }
