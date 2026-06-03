@@ -3317,8 +3317,7 @@ async function unwrapMasterKeyWithRecovery(recoveryWrap, recoveryKey){
    URL WHITELIST (v1.60.0) — Phishing prevention
    ============================================================ */
 const TRUSTED_HOSTS = [
-  'hatn-saomai.github.io',
-  'hatnsaomai.github.io',
+  'saomaiport.github.io',
   'localhost',
   '127.0.0.1'
 ];
@@ -3333,7 +3332,7 @@ function checkHostnameSafety(){
     if(trusted.includes(h)) return;
     const banner = document.createElement('div');
     banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99998;background:#b8472e;color:#fff;text-align:center;padding:14px 16px;font-family:Inter,sans-serif;font-size:14px;font-weight:600;border-bottom:2px solid #8b3a2a;box-shadow:0 4px 12px rgba(0,0,0,.3)';
-    banner.innerHTML = `⚠ CẢNH BÁO BẢO MẬT: Bạn đang truy cập từ <b>${h}</b> — không phải trang chính thức. <b>KHÔNG nhập mật khẩu/2FA tại đây</b> — có thể là trang giả mạo. <a href="https://hatn-saomai.github.io/cang-app/" style="color:#fff;text-decoration:underline">Mở trang chính thức →</a>`;
+    banner.innerHTML = `⚠ CẢNH BÁO BẢO MẬT: Bạn đang truy cập từ <b>${h}</b> — không phải trang chính thức. <b>KHÔNG nhập mật khẩu/2FA tại đây</b> — có thể là trang giả mạo. <a href="https://saomaiport.github.io/erp-app/" style="color:#fff;text-decoration:underline">Mở trang chính thức →</a>`;
     document.body.insertBefore(banner, document.body.firstChild);
     console.warn('[security] Untrusted hostname:', h);
   }catch(e){}
@@ -4311,6 +4310,19 @@ async function authAction(){
   // v1.64.0: Máy mới qua Smart Setup — có pending scriptUrl, cfg local chưa có
   // → pull cfg từ cloud trước khi login
   if(!cfg){
+    // v1.00-SMP: Nếu đang ở màn THIẾT LẬP (form setup hiện), route theo tab mode
+    // TRƯỚC — kể cả khi app đã nhúng COMPANY_SCRIPT_URL. Cho phép admin tạo
+    // công ty mới trên app production (trước đây bị kẹt vì luôn nhảy vào cloud-login).
+    const setupForm=document.getElementById('auth-setup-form');
+    const inSetupScreen = setupForm
+      && getComputedStyle(setupForm).display!=='none'
+      && document.querySelector('.auth-tab.active');
+    if(inSetupScreen){
+      const mode=document.querySelector('.auth-tab.active').dataset.mode;
+      if(mode==='restore') return authRestore();
+      if(mode==='cloud') return authCloudPull();
+      if(mode==='new') return authSetup();
+    }
     const pendingUrl=sessionStorage.getItem('smpcang_pending_scripturl');
     // v2.06.0: máy trắng — pull cfg từ cloud nếu có pendingUrl (link mời)
     // HOẶC có COMPANY_SCRIPT_URL nhúng sẵn trong app (bản production).
@@ -8140,7 +8152,7 @@ function _helpSection_common(){
     <h3>1. Đăng nhập lần đầu</h3>
     <p>Bạn sẽ nhận từ admin <strong>3 thông tin</strong> qua kênh riêng (Zalo/email):</p>
     <ul>
-      <li><strong>URL app:</strong> <code>https://hatn-saomai.github.io/cang-app/</code></li>
+      <li><strong>URL app:</strong> <code>https://saomaiport.github.io/erp-app/</code></li>
       <li><strong>Tên đăng nhập</strong> (vd: <code>nv-thuy</code>)</li>
       <li><strong>Mật khẩu tạm thời</strong> (bạn phải đổi ngay sau đăng nhập)</li>
     </ul>
