@@ -644,7 +644,7 @@ body.readonly-mode::before{
       <label class="fx-label">FX <span style="opacity:.55">VND/USD</span></label>
       <input type="number" id="fx-rate" class="fx-input" placeholder="—" data-skip-format="1" value="">
       <div id="fx-loading-indicator" style="display:none;font-size:9px;color:var(--accent);font-style:italic;margin-top:2px">đang tải...</div>
-      <div class="ccy-toggle">
+      <div class="ccy-toggle" style="display:none">
         <button id="ccy-USD" onclick="setDisplayCcy('USD')">USD</button>
         <button id="ccy-VND" onclick="setDisplayCcy('VND')">VND</button>
       </div>
@@ -684,14 +684,14 @@ body.readonly-mode::before{
 <nav class="nav" id="nav">
   <button class="nav-item active" data-page="dashboard"><span class="num">00</span>Dashboard</button>
   <button class="nav-item" data-page="catalog"><span class="num">M</span>Danh mục</button>
-  <button class="nav-item" data-page="projects"><span class="num">02</span>Dự án</button>
-  <button class="nav-item" data-page="vessels"><span class="num">03</span>ON-OFFHIRE</button>
+  <button class="nav-item" data-page="projects" style="display:none"><span class="num">02</span>Dự án</button>
+  <button class="nav-item" data-page="vessels" style="display:none"><span class="num">03</span>ON-OFFHIRE</button>
   <div class="nav-group">
     <button class="nav-item nav-group-btn" data-group="receivables_payables"><span class="num">04</span>Công nợ <span class="caret">▾</span></button>
     <div class="nav-submenu" id="submenu-receivables_payables">
       <button class="nav-sub-item" data-page="receivables"><span class="sub-dot"></span>Phải thu (Doanh thu + AR)</button>
       <button class="nav-sub-item" data-page="payables"><span class="sub-dot"></span>Phải trả (Tổng AP)</button>
-      <button class="nav-sub-item" data-page="op_input" id="nav-op-input"><span class="sub-dot"></span>Thu-Chi hộ tàu QL</button>
+      <button class="nav-sub-item" data-page="op_input" id="nav-op-input" style="display:none"><span class="sub-dot"></span>Thu-Chi hộ tàu QL</button>
     </div>
   </div>
   <div class="nav-group" id="nav-group-expenses" style="display:none" data-legacy="true">
@@ -712,7 +712,7 @@ body.readonly-mode::before{
       <button class="nav-sub-item" data-page="cashflow"><span class="sub-dot"></span>Cash flow (forecast)</button>
     </div>
   </div>
-  <button class="nav-item" data-page="operations"><span class="num">06</span>QL vận hành tàu</button>
+  <button class="nav-item" data-page="operations" style="display:none"><span class="num">06</span>QL vận hành tàu</button>
   <button class="nav-item" data-page="approval" id="nav-approval"><span class="num">07</span>Phê duyệt</button>
   <div class="nav-group">
     <button class="nav-item nav-group-btn" data-group="assets"><span class="num">09</span>Tài sản <span class="caret">▾</span></button>
@@ -2683,7 +2683,7 @@ body.readonly-mode::before{
    ============================================================ */
 
 const AUTH_KEY='smp_cang_auth_v3';   // multi-user config (tách khỏi Seahorse)
-const APP_VERSION='1.00.01-SMP'; // fix: routing tao admin tren app nhung URL
+const APP_VERSION='1.00.03-SMP'; // an nav nghiep vu tau (buoc 1 go tau)
 
 /* v2.62.0: Token xác thực backend — PHẢI khớp API_TOKEN trong Apps Script (Code.gs).
    Mọi request tới Apps Script tự động được gắn token qua lớp bọc fetch bên dưới.
@@ -9982,7 +9982,7 @@ function defaultState(){
       'Khác (quản lý chung)'
     ],
     fxRate:25000,
-    displayCcy:'USD',
+    displayCcy:'VND',
     companyInfo:{
       name:'CTCP HÀNG HẢI VÀ NĂNG LƯỢNG HẢI MÃ',
       nameEn:'CTCP CẢNG SAOMAI',
@@ -12692,11 +12692,11 @@ function setupFxControls(){
    Chỉ dùng trong tab Vận hành tàu / Thu-chi hộ. Lõi báo cáo BI vẫn chỉ USD/VND. */
 const OP_CURRENCIES = ['USD','VND','SGD','EUR','CNY','JPY','THB','MYR','AUD','GBP'];
 function fxRate(){return Math.max(1,+S.fxRate||25000);}
-function displayCcy(){return S.displayCcy==='VND'?'VND':'USD';}
+function displayCcy(){return 'VND';}  /* v1.00-SMP: VNĐ cố định toàn app (công ty cảng hạch toán VNĐ) */
 function toDisplay(amount,sourceCcy){
   // Convert any amount from its source currency into the currently selected display currency
   if(amount==null||isNaN(amount)) return 0;
-  const src=(sourceCcy||'USD').toUpperCase();
+  const src=(sourceCcy||'VND').toUpperCase();
   const dst=displayCcy();
   if(src===dst) return amount;
   if(src==='USD'&&dst==='VND') return amount*fxRate();
