@@ -2683,7 +2683,7 @@ body.readonly-mode::before{
    ============================================================ */
 
 const AUTH_KEY='smp_cang_auth_v3';   // multi-user config (tách khỏi Seahorse)
-const APP_VERSION='1.00.03-SMP'; // an nav nghiep vu tau (buoc 1 go tau)
+const APP_VERSION='1.00.04-SMP'; // fix an nav tau that su (chan applyRoleUI + navTo)
 
 /* v2.62.0: Token xác thực backend — PHẢI khớp API_TOKEN trong Apps Script (Code.gs).
    Mọi request tới Apps Script tự động được gắn token qua lớp bọc fetch bên dưới.
@@ -8551,9 +8551,12 @@ function applyRoleUI(){
   // v1.53.0: BOD group access — admin or user.isBOD
   const canAccessBOD = isAdmin() || (CURRENT_USER && CURRENT_USER.isBOD);
   // Hide/show standalone nav items + submenu items
+  // v1.00-SMP: các trang nghiệp vụ tàu ĐÃ GỠ — ẩn vĩnh viễn, mọi vai trò
+  const REMOVED_PAGES=['projects','vessels','operations','op_input','vessel_expense'];
   document.querySelectorAll('.nav-item:not(.nav-group-btn)').forEach(b=>{
     const page=b.dataset.page;
     if(!page) return;
+    if(REMOVED_PAGES.includes(page)){ b.style.display='none'; return; }
     if(page==='dashboard'){
       b.style.display = user ? 'none' : '';
     } else if(page==='approval'){
@@ -8567,6 +8570,7 @@ function applyRoleUI(){
   document.querySelectorAll('.nav-sub-item').forEach(b=>{
     const page=b.dataset.page;
     if(!page) return;
+    if(REMOVED_PAGES.includes(page)){ b.style.display='none'; return; }
     if(page==='cashflow'){
       // v1.37.1: Cash flow chỉ cho admin + KT viên + L1 + L2
       const canCF=isAdmin()||canCheckAcc()||canApproveL1()||canApproveL2();
@@ -23970,6 +23974,11 @@ function _renderQuickView(){
 }
 
 function navTo(page){
+  // v1.00-SMP: chặn điều hướng tới trang nghiệp vụ tàu đã gỡ
+  if(['projects','vessels','operations','op_input','vessel_expense'].includes(page)){
+    console.warn('navTo: trang đã gỡ —', page);
+    return;
+  }
   // v2.28.0: tìm cả nav-item lẫn nav-sub-item; an toàn nếu không tìm thấy
   const el=document.querySelector(`.nav-item[data-page="${page}"]`)
         || document.querySelector(`.nav-sub-item[data-page="${page}"]`)
